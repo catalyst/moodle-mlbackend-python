@@ -48,6 +48,14 @@ EXPORT_MODEL_FILENAME = 'model.json'
 TARGET_BATCH_SIZE = 1000
 
 
+def result(status, *info, **kwargs):
+    return {
+        'status': status,
+        'info': info,
+        **kwargs
+    }
+
+
 class Classifier:
     """General classifier"""
 
@@ -244,12 +252,9 @@ class Classifier:
 
         if len(np.unique(self.y)) < self.n_classes:
             # We need samples belonging to all different classes.
-            result = dict()
-            result['status'] = NOT_ENOUGH_DATA
-            result['info'] = []
-            result['errors'] = 'Training data needs to include ' + \
-                'samples belonging to all classes'
-            return result
+            return result(NOT_ENOUGH_DATA,
+                          errors=('Training data needs to include '
+                                  'samples belonging to all classes'))
 
         # Load the loaded model if it exists.
         if self.classifier_exists():
@@ -262,21 +267,16 @@ class Classifier:
 
         self.store_classifier(trained_classifier)
 
-        result = dict()
-        result['status'] = OK
-        result['info'] = []
-        return result
+        return result(OK)
 
     def predict_dataset(self, filepath):
         """Predict labels for the provided dataset"""
 
         [sampleids, x] = self.get_unlabelled_samples(filepath)
 
-        if self.classifier_exists() is False:
-            result = dict()
-            result['status'] = NO_DATASET
-            result['info'] = ['Provided model have not been trained yet']
-            return result
+        if not self.classifier_exists():
+            return result(NO_DATASET,
+                          'Provided model have not been trained yet')
 
         classifier = self.load_classifier()
 
@@ -287,16 +287,13 @@ class Classifier:
         # Probabilities of the predicted response being correct.
         probabilities = y_proba[np.arange(len(y_proba)), y_pred]
 
-        result = dict()
-        result['status'] = OK
-        result['info'] = []
-        # First column sampleids, second the prediction and third how
-        # reliable is the prediction (from 0 to 1).
-        result['predictions'] = np.vstack((sampleids,
-                                           y_pred,
-                                           probabilities)).T.tolist()
-
-        return result
+        return result(OK,
+                      # First column sampleids, second the prediction
+                      # and third how reliable is the prediction (from
+                      # 0 to 1).
+                      predictions=np.vstack((sampleids,
+                                             y_pred,
+                                             probabilities)).T.tolist())
 
     def evaluate_dataset(self, filepath, min_score=0.6,
                          accepted_deviation=0.02, n_test_runs=100,
@@ -312,12 +309,10 @@ class Classifier:
         unique_elements, counts = np.unique(y_array, return_counts=True)
 
         if not np.array_equal(np.sort(self.classes), np.sort(unique_elements)):
-            result = dict()
-            result['runid'] = int(self.runid)
-            result['status'] = GENERAL_ERROR
-            result['info'] = ['The labels from the provided dataset do not ' +
-                              'match the targetclasses from the header']
-            return result
+            return result(GENERAL_ERROR,
+                          ('The labels from the provided dataset do not '
+                           'match the targetclasses from the header'),
+                          runid=int(self.runid))
 
         logging.info('Number of samples by y value: %s', str(counts))
         balanced_classes = self.check_classes_balance(counts)
@@ -327,12 +322,10 @@ class Classifier:
         # Check that we have samples belonging to all classes.
         for i in range(len(counts)):
             if counts[i] == 0:
-                result = dict()
-                result['runid'] = int(self.runid)
-                result['status'] = GENERAL_ERROR
-                result['info'] = ['The provided dataset does not contain ' +
-                                  'samples for each class']
-                return result
+                return result(GENERAL_ERROR,
+                              ('The provided dataset does not contain '
+                               'samples for each class'),
+                              runid=int(self.runid))
 
         if trained_model_dir is not False:
             # Load the trained model in the provided path and evaluate it.
@@ -361,28 +354,28 @@ class Classifier:
         logging.info("Figure stored in " + self.roc_curve_plot.store())
 
         # Return results.
-        result = self.get_evaluation_results(min_score, accepted_deviation)
+        _result = self.get_evaluation_results(min_score, accepted_deviation)
 
-        print("score: " + str(result['score']))
+        print("score: " + str(_result['score']))
 
         # Add the run id to identify it in the caller.
-        result['runid'] = int(self.runid)
+        _result['runid'] = int(self.runid)
 
         if self.is_binary:
-            logging.info("AUC: %.2f%%", result['auc'])
+            logging.info("AUC: %.2f%%", _result['auc'])
             logging.info("AUC standard deviation: %.4f",
-                         result['auc_deviation'])
+                         _result['auc_deviation'])
 
-        logging.info("Accuracy: %.2f%%", result['accuracy'] * 100)
+        logging.info("Accuracy: %.2f%%", _result['accuracy'] * 100)
         logging.info("Precision (predicted elements that are real): %.2f%%",
-                     result['precision'] * 100)
+                     _result['precision'] * 100)
         logging.info("Recall (real elements that are predicted): %.2f%%",
-                     result['recall'] * 100)
-        logging.info("Score: %.2f%%", result['score'] * 100)
+                     _result['recall'] * 100)
+        logging.info("Score: %.2f%%", _result['score'] * 100)
         logging.info("Score standard deviation: %.4f",
-                     result['score_deviation'])
+                     _result['score_deviation'])
 
-        return result
+        return _result
 
     def rate_prediction(self, classifier, X_test, y_test):
         """Rate a trained classifier with test data"""
