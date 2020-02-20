@@ -146,7 +146,8 @@ class Classifier:
         self.precisions = []
         self.recalls = []
         self.f1_scores = []
-
+        self.aucs = []
+        self.roc_curve_plot = chart.RocCurve(self.logsdir, 2)
 
     def __init__(self, modelid, directory, dataset=None):
         self.X = None
@@ -174,9 +175,6 @@ class Classifier:
         warnings.showwarning = self.warnings_to_log
 
         self.reset_metrics()
-
-        self.aucs = []
-        self.roc_curve_plot = chart.RocCurve(self.logsdir, 2)
 
         if dataset:
             meta = self.get_metadata(dataset)
