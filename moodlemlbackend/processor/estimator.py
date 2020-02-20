@@ -53,13 +53,6 @@ class Estimator(object):
         logging.warning('%s:%s: %s:%s', filename, lineno,
                         category.__name__, message)
 
-    def store_classifier(self, trained_classifier):
-        """Stores the provided classifier"""
-        trained_classifier.variable_columns = self.variable_columns
-        classifier_filepath = os.path.join(
-            self.persistencedir, PERSIST_FILENAME)
-        joblib.dump(trained_classifier, classifier_filepath)
-
     @staticmethod
     def get_labelled_samples(filepath):
         """Extracts labelled samples from the provided data file"""
@@ -551,8 +544,11 @@ class Classifier(Estimator):
         trained_classifier.save(path)
         path = os.path.join(self.get_tensor_logdir(), 'model.ckpt')
         trained_classifier.save(path)
-        super().store_classifier(trained_classifier)
-        
+        trained_classifier.variable_columns = self.variable_columns
+        classifier_filepath = os.path.join(
+            self.persistencedir, PERSIST_FILENAME)
+        joblib.dump(trained_classifier, classifier_filepath)
+
     def load_classifier(self, model_dir=False):
         """Loads a previously trained classifier and restores its state"""
 
