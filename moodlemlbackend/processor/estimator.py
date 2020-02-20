@@ -183,7 +183,7 @@ class Classifier:
             self.n_classes = meta['n_classes']
             self.is_binary = self.n_classes == 2
 
-        self.tensor_logdir = self.get_tensor_logdir()
+        self.tensor_logdir = os.path.join(self.logsdir, 'tensor')
         os.makedirs(self.tensor_logdir, exist_ok=True)
 
     def get_classifier(self, X, y, initial_weights=False):
@@ -210,7 +210,7 @@ class Classifier:
         n_features = X.shape[1]
 
         return tensor.TF(n_features, n_classes, n_epoch, batch_size,
-                         self.get_tensor_logdir(),
+                         self.tensor_logdir,
                          initial_weights=initial_weights)
 
     def train(self, X_train, y_train, classifier=False, log_run=True):
@@ -524,7 +524,7 @@ class Classifier:
         # Store the graph state.
         path = os.path.join(self.persistencedir, 'model.ckpt')
         trained_classifier.save(path)
-        path = os.path.join(self.get_tensor_logdir(), 'model.ckpt')
+        path = os.path.join(self.tensor_logdir, 'model.ckpt')
         trained_classifier.save(path)
         trained_classifier.variable_columns = self.variable_columns
         classifier_filepath = os.path.join(
@@ -546,7 +546,7 @@ class Classifier:
 
         self.variable_columns = getattr(classifier, 'variable_columns', None)
 
-        classifier.set_tensor_logdir(self.get_tensor_logdir())
+        classifier.set_tensor_logdir(self.tensor_logdir)
 
         return classifier
 
@@ -599,7 +599,3 @@ class Classifier:
         classifier_file = os.path.join(self.persistencedir,
                                        PERSIST_FILENAME)
         return os.path.isfile(classifier_file)
-
-    def get_tensor_logdir(self):
-        """Returns the directory to store tensorflow framework logs"""
-        return os.path.join(self.logsdir, 'tensor')
