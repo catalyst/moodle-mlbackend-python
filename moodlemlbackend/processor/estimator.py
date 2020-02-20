@@ -53,10 +53,6 @@ class Estimator(object):
         logging.warning('%s:%s: %s:%s', filename, lineno,
                         category.__name__, message)
 
-    def get_runid(self):
-        """Returns the run id"""
-        return self.runid
-
     def load_classifier(self, model_dir=False):
         """Loads a previously stored classifier"""
 
@@ -358,7 +354,7 @@ class Classifier(Estimator):
 
         if not np.array_equal(np.sort(self.classes), np.sort(unique_elements)):
             result = dict()
-            result['runid'] = int(self.get_runid())
+            result['runid'] = int(self.runid)
             result['status'] = GENERAL_ERROR
             result['info'] = ['The labels from the provided dataset do not ' +
                               'match the targetclasses from the header']
@@ -373,7 +369,7 @@ class Classifier(Estimator):
         for i in range(len(counts)):
             if counts[i] == 0:
                 result = dict()
-                result['runid'] = int(self.get_runid())
+                result['runid'] = int(self.runid)
                 result['status'] = GENERAL_ERROR
                 result['info'] = ['The provided dataset does not contain ' +
                                   'samples for each class']
@@ -411,7 +407,7 @@ class Classifier(Estimator):
         print("score: " + str(result['score']))
 
         # Add the run id to identify it in the caller.
-        result['runid'] = int(self.get_runid())
+        result['runid'] = int(self.runid)
 
         if self.is_binary:
             logging.info("AUC: %.2f%%", result['auc'])
