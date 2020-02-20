@@ -43,8 +43,8 @@ EXPORT_MODEL_FILENAME = 'model.json'
 TARGET_BATCH_SIZE = 1000
 
 
-class Estimator(object):
-    """Abstract estimator class"""
+class Classifier:
+    """General classifier"""
 
     @staticmethod
     def warnings_to_log(message, category, filename, lineno, file=None,
@@ -142,9 +142,6 @@ class Estimator(object):
         self.recalls = []
         self.f1_scores = []
 
-
-class Classifier(Estimator):
-    """General classifier"""
 
     def __init__(self, modelid, directory, dataset=None):
         self.X = None
