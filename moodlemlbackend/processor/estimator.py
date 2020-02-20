@@ -46,39 +46,6 @@ TARGET_BATCH_SIZE = 1000
 class Estimator(object):
     """Abstract estimator class"""
 
-    def __init__(self, modelid, directory):
-
-        self.X = None
-        self.y = None
-        self.variable_columns = None
-
-        self.modelid = modelid
-
-        # Using milliseconds to avoid collisions.
-        self.runid = str(int(time.time() * 1000))
-
-        self.persistencedir = os.path.join(directory, 'classifier')
-
-        os.makedirs(self.persistencedir, exist_ok=True)
-
-        # We define logsdir even though we may not use it.
-        self.logsdir = os.path.join(directory, 'logs', self.get_runid())
-        os.makedirs(self.logsdir)
-
-        # Logging.
-        logfile = os.path.join(self.logsdir, 'info.log')
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
-        logging.basicConfig(filename=logfile, level=logging.DEBUG)
-        warnings.showwarning = self.warnings_to_log
-
-        self.reset_metrics()
-
-        np.set_printoptions(suppress=True)
-        np.set_printoptions(precision=5)
-        np.set_printoptions(threshold=np.inf)
-        np.seterr(all='raise')
-
     @staticmethod
     def warnings_to_log(message, category, filename, lineno, file=None,
                         line=None):
@@ -217,7 +184,36 @@ class Classifier(Estimator):
     """General classifier"""
 
     def __init__(self, modelid, directory, dataset=None):
-        super(Classifier, self).__init__(modelid, directory)
+        self.X = None
+        self.y = None
+        self.variable_columns = None
+
+        self.modelid = modelid
+
+        # Using milliseconds to avoid collisions.
+        self.runid = str(int(time.time() * 1000))
+
+        self.persistencedir = os.path.join(directory, 'classifier')
+
+        os.makedirs(self.persistencedir, exist_ok=True)
+
+        # We define logsdir even though we may not use it.
+        self.logsdir = os.path.join(directory, 'logs', self.runid)
+        os.makedirs(self.logsdir)
+
+        # Logging.
+        logfile = os.path.join(self.logsdir, 'info.log')
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
+        logging.basicConfig(filename=logfile, level=logging.DEBUG)
+        warnings.showwarning = self.warnings_to_log
+
+        self.reset_metrics()
+
+        np.set_printoptions(suppress=True)
+        np.set_printoptions(precision=5)
+        np.set_printoptions(threshold=np.inf)
+        np.seterr(all='raise')
 
         self.aucs = []
         self.roc_curve_plot = chart.RocCurve(self.logsdir, 2)
