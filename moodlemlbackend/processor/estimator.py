@@ -30,6 +30,11 @@ from .. import chart
 
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+np.set_printoptions(suppress=True)
+np.set_printoptions(precision=5)
+np.set_printoptions(threshold=np.inf)
+np.seterr(all='raise')
+
 
 OK = 0
 GENERAL_ERROR = 1
@@ -169,11 +174,6 @@ class Classifier:
         warnings.showwarning = self.warnings_to_log
 
         self.reset_metrics()
-
-        np.set_printoptions(suppress=True)
-        np.set_printoptions(precision=5)
-        np.set_printoptions(threshold=np.inf)
-        np.seterr(all='raise')
 
         self.aucs = []
         self.roc_curve_plot = chart.RocCurve(self.logsdir, 2)
