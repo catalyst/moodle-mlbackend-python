@@ -165,7 +165,7 @@ class Classifier:
 
         # We define logsdir even though we may not use it.
         self.logsdir = os.path.join(directory, 'logs', self.runid)
-        os.makedirs(self.logsdir)
+        os.makedirs(self.logsdir, exist_ok=True)
 
         # Logging.
         logfile = os.path.join(self.logsdir, 'info.log')
