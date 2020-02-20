@@ -53,22 +53,6 @@ class Estimator(object):
         logging.warning('%s:%s: %s:%s', filename, lineno,
                         category.__name__, message)
 
-    def load_classifier(self, model_dir=False):
-        """Loads a previously stored classifier"""
-
-        if model_dir is False:
-            model_dir = self.persistencedir
-
-        classifier_filepath = os.path.join(
-            model_dir, PERSIST_FILENAME)
-
-        classifier = joblib.load(classifier_filepath)
-        self.variable_columns = getattr(classifier, 'variable_columns', None)
-        path = os.path.join(model_dir, 'model.ckpt')
-        classifier.load(path)
-
-        return classifier
-
     def store_classifier(self, trained_classifier):
         """Stores the provided classifier"""
         trained_classifier.variable_columns = self.variable_columns
@@ -568,14 +552,21 @@ class Classifier(Estimator):
         path = os.path.join(self.get_tensor_logdir(), 'model.ckpt')
         trained_classifier.save(path)
         super().store_classifier(trained_classifier)
-
+        
     def load_classifier(self, model_dir=False):
         """Loads a previously trained classifier and restores its state"""
 
         if model_dir is False:
             model_dir = self.persistencedir
 
-        classifier = super(Classifier, self).load_classifier(model_dir)
+        classifier_filepath = os.path.join(
+            model_dir, PERSIST_FILENAME)
+
+        classifier = joblib.load(classifier_filepath)
+        path = os.path.join(model_dir, 'model.ckpt')
+        classifier.load(path)
+
+        self.variable_columns = getattr(classifier, 'variable_columns', None)
 
         classifier.set_tensor_logdir(self.get_tensor_logdir())
 
