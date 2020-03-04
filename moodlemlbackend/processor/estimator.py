@@ -539,7 +539,7 @@ class Classifier:
 
         self.variable_columns = getattr(classifier, 'variable_columns', None)
 
-        classifier.set_tensor_logdir(self.tensor_logdir)
+        classifier.tensor_logdir = self.tensor_logdir
 
         return classifier
 

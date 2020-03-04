@@ -43,14 +43,6 @@ class TF(object):
         self.__dict__.update(state)
         self.build_graph()
 
-    def set_tensor_logdir(self, tensor_logdir):
-        """Sets tensorflow logs directory
-
-        Needs to be set separately as it depends on the
-        run, it can not be restored."""
-
-        self.tensor_logdir = tensor_logdir
-
     def build_graph(self, initial_weights=False):
         """Builds the computational graph without feeding any data in"""
         tf.compat.v1.reset_default_graph()
