@@ -11,6 +11,8 @@ import numpy as np
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 MODEL_DTYPE = 'float32'
+TARGET_BATCH_SIZE = 1000
+
 
 class TF(object):
     """Tensorflow classifier"""
@@ -80,6 +82,18 @@ class TF(object):
 
     def fit(self, X, y, log_run=True):
         """Fit the model to the provided data"""
+
+        n_rows, n_features = X.shape
+        n_batches = (n_rows + TARGET_BATCH_SIZE - 1) // TARGET_BATCH_SIZE
+        n_batches = min(n_batches, 10)
+        batch_size = (n_rows + n_batches - 1) // n_batches
+
+        # the number of epochs can be smaller if we have a large
+        # number of samples. On the other hand it must also be small
+        # if we have very few samples, or the model will overfit. What
+        # we can say is that with larger batches we need more epochs.
+        n_epoch = 40 + batch_size // 20
+
         y = preprocessing.MultiLabelBinarizer().fit_transform(
             y.reshape(len(y), 1))
         y = y.astype(np.float32)
@@ -96,8 +110,8 @@ class TF(object):
             kwargs['callbacks'] = [cb]
 
         history = self.model.fit(X, y,
-                                 self.batch_size,
-                                 self.n_epoch,
+                                 batch_size,
+                                 n_epoch,
                                  verbose=2,
                                  validation_split=0.1,  # XXX
                                  **kwargs
