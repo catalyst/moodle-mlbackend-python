@@ -18,7 +18,7 @@ class TF(object):
     """Tensorflow classifier"""
 
     def __init__(self, n_features, n_classes,
-                 tensor_logdir, initial_weights=False):
+                 tensor_logdir):
 
         self.n_features = n_features
 
@@ -29,7 +29,7 @@ class TF(object):
         self.n_classes = n_classes
         self.tensor_logdir = tensor_logdir
 
-        self.build_graph(initial_weights)
+        self.build_graph()
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -43,7 +43,7 @@ class TF(object):
         self.__dict__.update(state)
         self.build_graph()
 
-    def build_graph(self, initial_weights=False):
+    def build_graph(self):
         """Builds the computational graph without feeding any data in"""
         tf.compat.v1.reset_default_graph()
         tf.keras.backend.clear_session()

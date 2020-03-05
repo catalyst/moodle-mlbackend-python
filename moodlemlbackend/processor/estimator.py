@@ -556,8 +556,7 @@ class Classifier:
 
         classifier = tensor.TF(self.n_features,
                                self.n_classes,
-                               tensor_logdir=self.tensor_logdir,
-                               initial_weights=import_vars)
+                               tensor_logdir=self.tensor_logdir)
 
         self.store_classifier(classifier)
 
