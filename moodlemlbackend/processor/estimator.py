@@ -221,12 +221,8 @@ class Classifier:
                          self.tensor_logdir,
                          initial_weights=initial_weights)
 
-    def train(self, X_train, y_train, classifier=False, log_run=True):
+    def train(self, X_train, y_train, classifier, log_run=True):
         """Train the classifier with the provided training data"""
-
-        if classifier is False:
-            # Init the classifier.
-            classifier = self.get_classifier(X_train, y_train)
 
         # Fit the training set. y should be an array-like.
         classifier.fit(X_train, y_train[:, 0], log_run=log_run)
@@ -261,7 +257,7 @@ class Classifier:
             classifier = self.load_classifier()
         else:
             # Not previously trained.
-            classifier = False
+            classifier = self.get_classifier(self.X, self.y)
 
         trained_classifier = self.train(self.X, self.y, classifier)
 
@@ -346,7 +342,8 @@ class Classifier:
                     continue
 
                 log_run = i == 0
-                classifier = self.train(X_train, y_train, log_run=log_run)
+                classifier = self.get_classifier(X_train, y_train)
+                self.train(X_train, y_train, classifier, log_run=log_run)
 
                 self.rate_prediction(classifier, X_test, y_test)
 
