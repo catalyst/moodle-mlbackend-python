@@ -582,8 +582,12 @@ class Classifier:
         else:
             self.n_classes = 2
 
-        classifier = self.get_classifier(False, False,
-                                         initial_weights=import_vars)
+        classifier = tensor.TF(self.n_features,
+                               self.n_classes,
+                               n_epoch=1,
+                               batch_size=1000,
+                               tensor_logdir=self.tensor_logdir,
+                               initial_weights=import_vars)
 
         self.store_classifier(classifier)
 
