@@ -194,16 +194,10 @@ class Classifier:
         self.tensor_logdir = os.path.join(self.logsdir, 'tensor')
         os.makedirs(self.tensor_logdir, exist_ok=True)
 
-    def get_classifier(self, X, y, initial_weights=False):
+    def get_classifier(self, X, y):
         """Gets the classifier"""
 
-        try:
-            n_rows = X.shape[0]
-        except AttributeError:
-            # No X during model import.
-            # n_rows value does not really matter during import.
-            n_rows = 1
-
+        n_rows, n_features = X.shape
         n_batches = (n_rows + TARGET_BATCH_SIZE - 1) // TARGET_BATCH_SIZE
         n_batches = min(n_batches, 10)
         batch_size = (n_rows + n_batches - 1) // n_batches
@@ -215,11 +209,9 @@ class Classifier:
         n_epoch = 40 + batch_size // 20
 
         n_classes = self.n_classes
-        n_features = X.shape[1]
 
         return tensor.TF(n_features, n_classes, n_epoch, batch_size,
-                         self.tensor_logdir,
-                         initial_weights=initial_weights)
+                         self.tensor_logdir)
 
     def train(self, X_train, y_train, classifier, log_run=True):
         """Train the classifier with the provided training data"""
