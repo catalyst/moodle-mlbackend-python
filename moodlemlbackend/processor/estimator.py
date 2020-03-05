@@ -223,12 +223,8 @@ class Classifier:
 
     def train(self, X_train, y_train, classifier, log_run=True):
         """Train the classifier with the provided training data"""
-
-        # Fit the training set. y should be an array-like.
         classifier.fit(X_train, y_train[:, 0], log_run=log_run)
         self.store_classifier(classifier)
-        # Returns the trained classifier.
-        return classifier
 
     def remove_invariant_columns(self, X):
         if self.variable_columns is None:
@@ -259,7 +255,7 @@ class Classifier:
             # Not previously trained.
             classifier = self.get_classifier(self.X, self.y)
 
-        trained_classifier = self.train(self.X, self.y, classifier)
+        self.train(self.X, self.y, classifier)
 
         return result(OK)
 
