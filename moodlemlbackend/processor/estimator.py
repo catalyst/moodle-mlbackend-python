@@ -261,8 +261,6 @@ class Classifier:
 
         trained_classifier = self.train(self.X, self.y, classifier)
 
-        self.store_classifier(trained_classifier)
-
         return result(OK)
 
     def predict_dataset(self, filepath):
