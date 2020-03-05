@@ -197,20 +197,9 @@ class Classifier:
     def get_classifier(self, X, y):
         """Gets the classifier"""
 
-        n_rows, n_features = X.shape
-        n_batches = (n_rows + TARGET_BATCH_SIZE - 1) // TARGET_BATCH_SIZE
-        n_batches = min(n_batches, 10)
-        batch_size = (n_rows + n_batches - 1) // n_batches
-
-        # the number of epochs can be smaller if we have a large
-        # number of samples. On the other hand it must also be small
-        # if we have very few samples, or the model will overfit. What
-        # we can say is that with larger batches we need more epochs.
-        n_epoch = 40 + batch_size // 20
-
-        n_classes = self.n_classes
-
-        return tensor.TF(n_features, n_classes, n_epoch, batch_size,
+        n_features = X.shape[1]
+        return tensor.TF(n_features,
+                         self.n_classes,
                          self.tensor_logdir)
 
     def train(self, X_train, y_train, classifier, log_run=True):
@@ -567,8 +556,6 @@ class Classifier:
 
         classifier = tensor.TF(self.n_features,
                                self.n_classes,
-                               n_epoch=1,
-                               batch_size=1000,
                                tensor_logdir=self.tensor_logdir,
                                initial_weights=import_vars)
 

@@ -17,11 +17,9 @@ TARGET_BATCH_SIZE = 1000
 class TF(object):
     """Tensorflow classifier"""
 
-    def __init__(self, n_features, n_classes, n_epoch, batch_size,
+    def __init__(self, n_features, n_classes,
                  tensor_logdir, initial_weights=False):
 
-        self.n_epoch = n_epoch
-        self.batch_size = batch_size
         self.n_features = n_features
 
         # Based on the number of features although we need a reasonable
